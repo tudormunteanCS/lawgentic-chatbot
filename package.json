@@ -1,5 +1,6 @@
 {
   "name": "law-agent-app",
+  "homepage": "https://tudormunteanCS.github.io/lawgentic-chatbot/",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,12 +8,15 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.12",
     "axios": "^1.11.0",
     "framer-motion": "^12.23.12",
+    "gh-pages": "^6.3.0",
     "lucide-react": "^0.540.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
