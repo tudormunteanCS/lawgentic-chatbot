@@ -123,7 +123,7 @@ export default function ChatPage() {
     // const reply = `You said: "${userText.trim()}".\n(Replace this with your model’s response.)`;
     try{
       const startTime = Date.now();
-      const reply = await axios.post('https://addressing-dts-annoying-vernon.trycloudflare.com/answer', { question: userText }).then(res => res.data);
+      const reply = await axios.post('https://hopefully-bahamas-binary-five.trycloudflare.com /answer', { question: userText }).then(res => res.data);
       const endTime = Date.now();
       const latency = endTime - startTime;
       console.log(`Latency: ${latency}ms`);
