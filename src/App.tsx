@@ -121,14 +121,25 @@ export default function ChatPage() {
     await new Promise((r) => setTimeout(r, 400));
     // Very simple echo-style response. Replace with your API call.
     // const reply = `You said: "${userText.trim()}".\n(Replace this with your model’s response.)`;
-    const startTime = Date.now();
-    const reply = await axios.post('http://localhost:5000/answer', { question: userText }).then(res => res.data);
-    const endTime = Date.now();
-    const latency = endTime - startTime;
-    console.log(`Latency: ${latency}ms`);
-    // console.log(reply.answer);
-    pushMessage("assistant", reply.answer);
-    setIsReplying(false);
+    try{
+      const startTime = Date.now();
+      const reply = await axios.post('http://localhost:5000/answer', { question: userText }).then(res => res.data);
+      const endTime = Date.now();
+      const latency = endTime - startTime;
+      console.log(`Latency: ${latency}ms`);
+      pushMessage("assistant", reply.answer);
+    }
+    catch (error: any){
+        // fallback message
+      pushMessage(
+        "assistant",
+        "Serverul nu este disponibil în acest moment. Te rog contactează-l pe Tudor să deschidă serverul."
+      );
+    }
+    finally{
+      setIsReplying(false);
+    }
+    
   }
 
   async function handleSend() {
