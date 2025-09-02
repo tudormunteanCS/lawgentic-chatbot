@@ -98,7 +98,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([{
     id: uid(),
     role: "assistant",
-    content: "Hi! I’m your AI assistant. Ask me anything.",
+    content: "Salut! Sunt asistentul tău juridic, specializat pe corpusuri esențiale ale legislației românești. Îmi poți adresa orice întrebare, iar eu îți voi oferi răspunsuri documentate cu referințe exacte (sursă, articol, alineat).",
     createdAt: Date.now(),
   }]);
   const [input, setInput] = useState("");
@@ -126,7 +126,7 @@ export default function ChatPage() {
     const endTime = Date.now();
     const latency = endTime - startTime;
     console.log(`Latency: ${latency}ms`);
-    console.log(reply.answer);
+    // console.log(reply.answer);
     pushMessage("assistant", reply.answer);
     setIsReplying(false);
   }
@@ -157,7 +157,7 @@ export default function ChatPage() {
             </div>
             <div>
               <h1 className="text-base font-semibold">Chatbot</h1>
-              <p className="text-xs text-slate-500">Your law agent</p>
+              <p className="text-xs text-slate-500">Agentul tău juridic</p>
             </div>
           </div>
         </div>
