@@ -123,7 +123,7 @@ export default function ChatPage() {
     // const reply = `You said: "${userText.trim()}".\n(Replace this with your model’s response.)`;
     try{
       const startTime = Date.now();
-      const reply = await axios.post('https://tribal-techno-print-understood.trycloudflare.com/answer', { question: userText }).then(res => res.data);
+      const reply = await axios.post('https://transport-rwanda-boc-dresses.trycloudflare.com//answer', { question: userText }).then(res => res.data);
       const endTime = Date.now();
       const latency = endTime - startTime;
       console.log(`Latency: ${latency}ms`);
@@ -131,6 +131,7 @@ export default function ChatPage() {
     }
     catch (error: any){
         // fallback message
+        console.log(error)
       pushMessage(
         "assistant",
         "Serverul nu este disponibil în acest moment. Te rog contactează-l pe Tudor să deschidă serverul."
