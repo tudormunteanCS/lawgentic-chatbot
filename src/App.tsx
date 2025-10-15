@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Bot, User as UserIcon } from "lucide-react";
+import { Send, Bot, User as UserIcon, ChevronDown } from "lucide-react";
 import axios from "axios";
 
 
@@ -26,6 +26,31 @@ type Message = {
   content: string;
   createdAt: number; // epoch ms
 };
+type ModelId = "lawgentic-thinking" | "lawgentic";
+
+
+type ModelOption = {
+  id: ModelId;
+  label: string;
+  hint: string;
+  reasoning: boolean; // whether this model uses chain-of-thought / reasoning mode on server
+};
+
+
+const MODEL_OPTIONS: ModelOption[] = [
+  {
+  id: "lawgentic-thinking",
+  label: "Lawgentic-Thinking",
+  hint: "Prompt processing + more reasoning",
+  reasoning: true,
+  },
+  {
+  id: "lawgentic",
+  label: "Lawgentic-Faster",
+  hint: "",
+  reasoning: false,
+  }
+];
 
 function uid() {
   return Math.random().toString(36).slice(2, 10);
@@ -94,6 +119,97 @@ function TypingIndicator() {
   );
 }
 
+/**
+* ModelSelector: un mic dropdown controlat, declanșat de clic pe label.
+*/
+function ModelSelector({
+selectedId,
+onSelect,
+}: {
+selectedId: ModelId;
+onSelect: (id: ModelId) => void;
+}) {
+const [open, setOpen] = useState(false);
+const selected = MODEL_OPTIONS.find((m) => m.id === selectedId)!;
+
+
+// închide dropdown-ul la clic în afara lui
+const rootRef = useRef<HTMLDivElement | null>(null);
+useEffect(() => {
+function onDocClick(e: MouseEvent) {
+if (!rootRef.current) return;
+if (!rootRef.current.contains(e.target as Node)) setOpen(false);
+}
+document.addEventListener("mousedown", onDocClick);
+return () => document.removeEventListener("mousedown", onDocClick);
+}, []);
+
+
+return (
+<div ref={rootRef} className="relative w-full max-w-xs">
+{/* Label care deschide/închide lista la clic */}
+<label
+htmlFor="model-trigger"
+className="block text-sm font-medium text-slate-700 mb-1 cursor-pointer"
+onClick={() => setOpen((v) => !v)}
+>
+Alege modelul
+</label>
+
+
+{/* Trigger vizual (buton) */}
+<button
+id="model-trigger"
+type="button"
+aria-haspopup="listbox"
+aria-expanded={open}
+onClick={() => setOpen((v) => !v)}
+className="w-full inline-flex items-center justify-between rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm hover:bg-slate-50"
+>
+<span className="flex flex-col text-left">
+<span className="font-medium">{selected.label}</span>
+<span className="text-[11px] text-slate-500">{selected.hint}</span>
+</span>
+<ChevronDown className={`h-4 w-4 transition ${open ? "rotate-180" : "rotate-0"}`} />
+</button>
+
+
+{/* Listă opțiuni */}
+<AnimatePresence>
+{open && (
+<motion.ul
+role="listbox"
+initial={{ opacity: 0, y: 4 }}
+animate={{ opacity: 1, y: 0 }}
+exit={{ opacity: 0, y: 4 }}
+className="absolute z-10 mt-2 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
+>
+{MODEL_OPTIONS.map((opt) => (
+<li key={opt.id} role="option" aria-selected={opt.id === selectedId}>
+<button
+type="button"
+onClick={() => {
+onSelect(opt.id);
+setOpen(false);
+}}
+className={`flex w-full items-start gap-2 px-3 py-2 text-sm hover:bg-slate-50 ${
+opt.id === selectedId ? "bg-slate-50" : "bg-white"
+}`}
+>
+<div className="flex flex-col text-left">
+<span className="font-medium">{opt.label}</span>
+<span className="text-[11px] text-slate-500">{opt.hint}</span>
+</div>
+</button>
+</li>
+))}
+</motion.ul>
+)}
+</AnimatePresence>
+</div>
+);
+}
+
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([{
     id: uid(),
@@ -102,8 +218,15 @@ export default function ChatPage() {
     createdAt: Date.now(),
   }]);
   const [input, setInput] = useState("");
+  const [selectedModel, setSelectedModel] = useState<ModelId>("lawgentic-thinking");
+  const [reasoning, setReasoning] = useState<boolean>(true);
   const [isReplying, setIsReplying] = useState(false);
 
+    // sincronizează booleanul `reasoning` cu modelul selectat
+  useEffect(() => {
+  const opt = MODEL_OPTIONS.find((o) => o.id === selectedModel);
+  setReasoning(Boolean(opt?.reasoning));
+  }, [selectedModel]);
   const scrollRef = useAutoscroll([messages.length, isReplying]);
 
   // Derived: placeholder dynamic text
@@ -119,11 +242,9 @@ export default function ChatPage() {
     setIsReplying(true);
     // Simulate latency
     await new Promise((r) => setTimeout(r, 400));
-    // Very simple echo-style response. Replace with your API call.
-    // const reply = `You said: "${userText.trim()}".\n(Replace this with your model’s response.)`;
     try{
       const startTime = Date.now();
-      const reply = await axios.post('https://transport-rwanda-boc-dresses.trycloudflare.com//answer', { question: userText }).then(res => res.data);
+      const reply = await axios.post('http://localhost:5000/answer', { question: userText, reasoning: reasoning}).then(res => res.data);
       const endTime = Date.now();
       const latency = endTime - startTime;
       console.log(`Latency: ${latency}ms`);
@@ -159,6 +280,7 @@ export default function ChatPage() {
   }
 
   return (
+    <>
     <div className="min-h-screen w-full bg-gradient-to-b from-slate-50 to-slate-100 text-slate-900 flex items-center justify-center p-4">
       <div className="mx-auto w-full max-w-3xl grid grid-rows-[auto,1fr,auto] rounded-2xl border border-slate-200 bg-white shadow-xl overflow-hidden">
         {/* Header */}
@@ -172,6 +294,14 @@ export default function ChatPage() {
               <p className="text-xs text-slate-500">Agentul tău juridic</p>
             </div>
           </div>
+        </div>
+
+        {/* Model Selector Row */}
+        <div className="px-5 py-3 bg-slate-50/60 border-b border-slate-200">
+        <ModelSelector
+        selectedId={selectedModel}
+        onSelect={(id) => setSelectedModel(id)}
+        />
         </div>
 
         {/* Messages */}
@@ -218,5 +348,6 @@ export default function ChatPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
