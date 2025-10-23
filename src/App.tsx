@@ -35,15 +35,15 @@ type ModelOption = {
 };
 
 const MODEL_OPTIONS: ModelOption[] = [
-  {
-    id: "lawgentic-thinking",
-    label: "Lawgentic-Thinking",
-    hint: "Prompt processing + more reasoning",
-    reasoning: true,
-  },
+  // {
+  //   id: "lawgentic-thinking",
+  //   label: "Lawgentic-Thinking",
+  //   hint: "Prompt processing + more reasoning",
+  //   reasoning: true,
+  // },
   {
     id: "lawgentic",
-    label: "Lawgentic-Faster",
+    label: "Lawgentic v1",
     hint: "",
     reasoning: false,
   },
@@ -271,7 +271,7 @@ export default function ChatPage() {
       const startTime = Date.now();
       const reply = await axios
         .post(
-          " https://c4espv7ytc.execute-api.us-east-1.amazonaws.com/default/lawgentic",
+          "https://otpr6gpxke.execute-api.eu-central-1.amazonaws.com/default/test_embedding_latency",
           { question: userText, reasoning: reasoning }
         )
         .then((res) => res.data);
@@ -317,7 +317,7 @@ export default function ChatPage() {
                 <Bot className="h-4 w-4" />
               </div>
               <div>
-                <h1 className="text-base font-semibold">Chatbot</h1>
+                <h1 className="text-base font-semibold">Lawgentic</h1>
                 <p className="text-xs text-slate-500">Agentul tău juridic</p>
               </div>
             </div>

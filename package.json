@@ -1,8 +1,8 @@
 {
   "name": "law-agent-app",
   "homepage": "https://tudormunteanCS.github.io/lawgentic-chatbot/",
-  "private": true,
-  "version": "0.0.0",
+  "private": false,
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
